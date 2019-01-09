@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: pengfei
- * Date: 2019/1/9
- * Time: 上午10:35
- */
 
 class Api{
 
