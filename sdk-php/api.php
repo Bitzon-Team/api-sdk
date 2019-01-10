@@ -60,7 +60,6 @@ class Api{
     public function getAccount()
     {
         $this->api = $this->api.'/v1/user/accounts';
-        $this->req_method = 'GET';
         $header = $this->createGetHeaderSign([]);
         return $this->curlGet($this->api,$header);
     }
