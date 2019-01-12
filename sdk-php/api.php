@@ -14,6 +14,16 @@ class Api{
         $this->secret_key = $secret_key;
     }
 
+    public function cancelOrder($order_id)
+    {
+          $this->api = $this->api.'/v1/trade/orders/'.$order_id.'/cancel';
+          $data = [
+              'orderId' => $order_id
+          ];
+          $header = $this->createPostHeaderSign($data);
+          return $this->curlPost($this->api,$data,$header);
+    }
+
     public function createOrder($datas = [])
     {
         $this->api = $this->api.'/v1/trade/orders/';
@@ -50,7 +60,6 @@ class Api{
     public function getAccount()
     {
         $this->api = $this->api.'/v1/user/accounts';
-        $this->req_method = 'GET';
         $header = $this->createGetHeaderSign([]);
         return $this->curlGet($this->api,$header);
     }
@@ -150,7 +159,6 @@ class Api{
     }
 }
 
-
 /**
  *  create order demo
  *
@@ -193,5 +201,10 @@ class Api{
  *
  */
 
-
-
+/**
+ *  cancel order
+ *
+    $Api = new Api('xxxxxx','xxxxx');
+    var_dump($Api->cancelOrder('1'));
+ *
+ */
