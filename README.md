@@ -1,67 +1,69 @@
 ### api-sdk
-声明：本SDK由社群热心用户提供，供接入机构/个人调用Bitzon API参考之用，代码可自由使用，但未经全面测试，Bitzon不承担任何连带责任。
+Disclaimer: This SDK is provided by the community's enthusiastic users for access to the Bitzon API reference by the access organization/individual. The code is free to use, but Bitzon does not assume any joint liability without full testing.
 
-使用本工程中代码造成的任何后果完全自负。
+Any consequences arising from the use of the code in this project are entirely at your own risk.
 
 ### Usage
-- 注册并登录Bitzon, 申请api key和secret
+- Sign up and log in to Bitzon, apply for api key and secret
 
 
 # APIS
 
 [TOC]
 
-## 接口列表
+## Api list
 
-`symbol` 规则：基础币种 + 计价币种，`BTC/USDT` 为 `BTC_USDT`。  
+`symbol` rule：quote currency + base currency，`BTC/USDT` => `BTC_USDT`。    
 
-| 接口数据类型 | 请求方法                                                     | 描述                          | 验签 |
-| ------------ | ------------------------------------------------------------ | ----------------------------- | ---- |
-| 市场行情     | `GET /v1/market/prices`                                      | 获取所有交易对当前市价        | N    |
-| 市场行情     | `GET /v1/market/fex`                                         | 获取美元对其他国家法币汇率    | N    |
-| 市场行情     | `GET /v1/market/bars/<symbol>/<type>`                        | 获取 K 线数据                 | N    |
-| 交易品种信息 | `GET /v1/market/feeRates`                                    | 获取手续费率                  | N    |
-| 交易品种信息 | `GET /v1/market/trades`                                      | 获取所有币种 / 交易对配置信息 | N    |
-| 系统信息     | `GET /v1/market/timestamp`                                   | 获取服务器时间戳              | N    |
-| 错误接口信息 | `GET /v1/market/errorCodes`                                  | 获取所有的错误码              | N    |
-| 错误接口信息 | `GET /v1/market/error`                                       | 错误响应示例                  | N    |
-| 交易         | `POST /v1/trade/orders`                                      | 创建订单                      | Y    |
-| 交易         | `GET /v1/trade/orders/<the-order-id>`                        | 查询指定订单                  | Y    |
-| 交易         | `GET /v1/trade/orders<?symbol=symbol><&offsetId=order-id><&limit=limit>` | 查询所有订单                  | Y    |
-| 交易         | `GET /v1/trade/orders/active`                                | 查询未完成订单                | Y    |
-| 交易         | `POST /v1/trade/orders/<order-id>/cancel`                    | 撤销订单                      | Y    |
+| Api type   | Request method and url                                       | Description                                         | Verification signature |
+| ---------- | ------------------------------------------------------------ | --------------------------------------------------- | ---------------------- |
+| Market     | `GET /v1/market/prices`                                      | Get current market prices of all symbols            | N                      |
+| Market     | `GET /v1/market/fex`                                         | Get US Dollar against other countries               | N                      |
+| Market     | `GET /v1/market/bars/<symbol>/<type>`                        | Get Klines                                          | N                      |
+| Market     | `GET URL /v1/market/depth/<symbol>`                          | Get market depth                                    | N                      |
+| BaseInfo   | `GET /v1/market/feeRates`                                    | Get a commission rate                               | N                      |
+| BaseInfo   | `GET /v1/market/trades`                                      | Get all currency / symbol configuration information | N                      |
+| Account    | `GET URL /v1/user/accounts`                                  | Get user balance                                    | Y                      |
+| SystemInfo | `GET /v1/market/timestamp`                                   | Get server timestamp                                | N                      |
+| ErrorInfo  | `GET /v1/market/errorCodes`                                  | Get all the error codes                             | N                      |
+| ErrorInfo  | `GET /v1/market/error`                                       | Error response example                              | N                      |
+| Trading    | `POST /v1/trade/orders`                                      | Create an order                                     | Y                      |
+| Trading    | `GET /v1/trade/orders/<the-order-id>`                        | Get the order detail of an order                    | Y                      |
+| Trading    | `GET /v1/trade/orders<?symbol=symbol><&offsetId=order-id><&limit=limit>` | Get all orders                                      | Y                      |
+| Trading    | `GET /v1/trade/orders/active`                                | Get outstanding orders                              | Y                      |
+| Trading    | `POST /v1/trade/orders/<order-id>/cancel`                    | Cancel order                                        | Y                      |
 
----
+------
 
-### 市场行情
+### Market
 
-#### 1. 获取所有交易对当前市价
+#### 1. Get current market prices of all symbols
 
-请求：
+Request：
 
 ```
 GET /v1/market/prices
 ```
 
-响应：
+Response：
 
-数据字段：
+Data fields：
 
-| 交易对名称 | 子数据                      | 类型   | 必须 | 描述             |
-| ---------- | --------------------------- | ------ | ---- | ---------------- |
-| AE_BTC     | 交易对当前市场数据数组 data | String | YES  | 交易对标识符     |
-|            | ——data[0]                   | Long   | NO   | 开盘价时间戳     |
-|            | ——data[1]                   | Float  | NO   | 开盘价           |
-|            | ——data[2]                   | Float  | NO   | 最高价           |
-|            | ——data[3]                   | Float  | NO   | 最低价           |
-|            | ——data[4]                   | Float  | NO   | 收盘价（当前价） |
-|            | ——data[5]                   | Float  | NO   | 成交量           |
+| Symbol | Subdata               | Type   | Must | Description                   |
+| ------ | --------------------- | ------ | ---- | ----------------------------- |
+| AE_BTC | Market data of symbol | String | YES  | Symbol                        |
+|        | ——data[0]             | Long   | NO   | Opening price time stamp      |
+|        | ——data[1]             | Float  | NO   | Opening price                 |
+|        | ——data[2]             | Float  | NO   | Highest price                 |
+|        | ——data[3]             | Float  | NO   | Lowest price                  |
+|        | ——data[4]             | Float  | NO   | Closing price (current price) |
+|        | ——data[5]             | Float  | NO   | Volume                        |
 
-数据示例：
+Data example：
 
 ```
 {
-	// 交易对标识符:[时间戳 timestamp in millis, 开盘价 open price, 最高价 high price, 最低价 low price, 收盘价(当前价) close price, 交易量 volume]
+    // symbol:[timestamp in millis, opening price, highest price, lowest price, closing price, volume]
     "AE_BTC": [
         1546239118833,
         0.0001,
@@ -82,36 +84,36 @@ GET /v1/market/prices
 }
 ```
 
-#### 2. 获取K线数据
+#### 2. Get Klines
 
-请求：
+Request：
 
 ```
 GET /v1/market/bars/<symbol>/<type>
 ```
 
-参数：
+Parameters：
 
-| 位置     | 类型   | 必须 | 描述                                                         |
-| -------- | ------ | ---- | ------------------------------------------------------------ |
-| <symbol> | String | YES  | 交易对标识符                                                 |
-| <type>   | String | YES  | K 线单位。如 "`K_1_SEC`", "`K_1_MIN`", "`K_1_HOUR`", "`K_1_DAY`". |
+| Parameter | Type   | Must | Description                                                  |
+| --------- | ------ | ---- | ------------------------------------------------------------ |
+| <symbol>  | String | YES  | e.g. 'BTC_USDT'                                              |
+| <type>    | String | YES  | K Time unit of K line。e.g. "`K_1_SEC`", "`K_1_MIN`", "`K_1_HOUR`", "`K_1_DAY`". |
 
-响应：
+Response：
 
-数据字段：
+Data fields：
 
-| 字段名称 | 子数据                       | 类型   | 必须 | 描述             |
-| -------- | ---------------------------- | ------ | ---- | ---------------- |
-| bars     | 交易对当前 K 线数据数组 data | String | YES  | 交易对标识符     |
-|          | ——data[0]                    | Long   | NO   | 开盘价时间戳     |
-|          | ——data[1]                    | Float  | NO   | 开盘价           |
-|          | ——data[2]                    | Float  | NO   | 最高价           |
-|          | ——data[3]                    | Float  | NO   | 最低价           |
-|          | ——data[4]                    | Float  | NO   | 收盘价（当前价） |
-|          | ——data[5]                    | Float  | NO   | 成交量           |
+| Field name | Subdata                 | Type   | Must | Description                   |
+| ---------- | ----------------------- | ------ | ---- | ----------------------------- |
+| bars       | K line data of symbols. | String | YES  | Symbol                        |
+|            | ——data[0]               | Long   | NO   | Opening price time stamp      |
+|            | ——data[1]               | Float  | NO   | Opening price                 |
+|            | ——data[2]               | Float  | NO   | Highest price                 |
+|            | ——data[3]               | Float  | NO   | Lowest price                  |
+|            | ——data[4]               | Float  | NO   | Closing price (current price) |
+|            | ——data[5]               | Float  | NO   | Volume                        |
 
-响应示例：
+Response example：
 
 ```
 {
@@ -136,35 +138,36 @@ GET /v1/market/bars/<symbol>/<type>
 }
 ```
 
-##### K 线数据格式
+##### Data format of K line
 
-包含六个元素的数组：
+All bar data is represented as array that contains 6 elements which are:
 
+[timestamp in millis, open price, high price, low price, close price, volume]
+
+Example:
 ```
-[时间戳 timestamp in millis, 开盘价 open price, 最高价 high price, 最低价 low price, 收盘价 close price, 交易量 volume]
-
-如 [1544602783000, 3302.1, 3419.9, 3029.6, 3298, 9.34]
+[1544602783000, 3302.1, 3419.9, 3029.6, 3298, 9.34]
 ```
 
-#### 3.  获取美元对其他国家法币汇率
+#### 3.  Get US Dollar against other countries
 
-请求：
+Request：
 
 ```
 GET /v1/market/fex
 ```
 
-响应：
+Response：
 
-数据字段：
+Data fields：
 
-| 字段名称  | 子数据       | 类型   | 必须 | 描述         |
-| --------- | ------------ | ------ | ---- | ------------ |
-| from      |              | String | YES  | 要转换的币种 |
-| tos       | 转换目标数组 | String | YES  | 转换目标数组 |
-| exchanges | 汇率数组     | String | YES  | 汇率数组     |
+| Field name | Subdata                 | Type   | Must | Description             |
+| ---------- | ----------------------- | ------ | ---- | ----------------------- |
+| from       |                         | String | YES  | The currency to convert |
+| tos        | Conversion target array | String | YES  | Conversion target array |
+| exchanges  | Exchange rate array     | String | YES  | Exchange rate array     |
 
-响应示例：
+Response example：
 
 ```
 {
@@ -198,89 +201,89 @@ GET /v1/market/fex
 }
 ```
 
-#### 4. 获取深度数据
+#### 4. Get market depth
 
-请求：
+Request：
 
 ```
 GET URL /v1/market/depth/<symbol>
 ```
 
-参数：
+Parameter：
 
-| 位置   | 类型   | 必须 | 描述         |
-| ------ | ------ | ---- | ------------ |
-| symbol | String | YES  | 交易对标识符 |
+| Parameter | Type   | Must | Description |
+| --------- | ------ | ---- | ----------- |
+| symbol    | String | YES  | Symbol      |
 
-响应：
+Response：
 
-数据字段：
+Data fields：
 
-| 字段信息   | 字段说明     |
-| ---------- | ------------ |
-| symbol     | 交易对标识符 |
-| timestamp  | 时间戳       |
-| price      | 价格         |
-| buyOrders  | 买盘数据     |
-| sellOrders | 卖盘数据     |
+| Field name | Description |
+| ---------- | ----------- |
+| symbol     | Symbol      |
+| timestamp  | Timestamp   |
+| price      | Price       |
+| buyOrders  | Buy data    |
+| sellOrders | Sell data   |
 
- 响应示例：
+Response example：
 
 ```
 {
-      	"symbol": "BTC_USDT",
-      	"sequenceId": 1929416,
-      	"timestamp": 1546659807581,
-      	"price": 3750.000000000000000000,
-      	"buyOrders": [{
-      		"price": 3746.700000000000000000,
-      		"amount": 0.000200000000000000
-      	}, {
-      		"price": 3741.000000000000000000,
-      		"amount": 0.000800000000000000
-      	}],
-      	"sellOrders": [{
-      		"price": 3750.770000000000000000,
-      		"amount": 0.000700000000000000
-      	}, {
-      		"price": 3750.870000000000000000,
-      		"amount": 0.000400000000000000
-      	}]
+        "symbol": "BTC_USDT",
+        "sequenceId": 1929416,
+        "timestamp": 1546659807581,
+        "price": 3750.000000000000000000,
+        "buyOrders": [{
+            "price": 3746.700000000000000000,
+            "amount": 0.000200000000000000
+        }, {
+            "price": 3741.000000000000000000,
+            "amount": 0.000800000000000000
+        }],
+        "sellOrders": [{
+            "price": 3750.770000000000000000,
+            "amount": 0.000700000000000000
+        }, {
+            "price": 3750.870000000000000000,
+            "amount": 0.000400000000000000
+        }]
 }
 ```
 
-### 交易品种信息
+### Base information
 
-#### 1. 获取所有币种/交易对信息
+#### 1. Get all currency / symbols information
 
-请求：
+Request：
 
 ```
 GET /v1/market/trades
 ```
 
-响应：
+Response：
 
-数据字段：
+Data fields：
 
-| 字段名称   | 子数据            | 类型   | 必须 | 描述               |
-| ---------- | ----------------- | ------ | ---- | ------------------ |
-| currencies | 币种状态          | String | YES  | 币种状态列表       |
-|            | ——name            | String | YES  | 币种名称           |
-|            | ——depositEnabled  | Bool   | YES  | 充币状态           |
-|            | ——withdrawEnabled | Bool   | YES  | 提币状态           |
-|            | ——meta            | String | NO   |                    |
-| symbols    | 交易对设置        | String | NO   | 所有的交易对的设置 |
-|            | ——name            | String | YES  | 交易对标识符       |
-|            | ——baseName        | String | YES  | 交易币种           |
-|            | ——baseScale       | Int    | YES  | 交易币种展示精度   |
-|            | ——baseMinimum     | Float  | YES  | 交易币种最小成交量 |
-|            | ——quoteName       | String | YES  | 计价币种           |
-|            | ——quoteScale      | Int    | YES  | 计价币种展示精度   |
-|            | ——quoteMinimum    | Float  | YES  | 计价币种最小成交量 |
-|            | ——startTime       | Long   | NO   |                    |
-|            | ——endTime         | Long   | NO   |                    |
-|            | ——meta            | String | NO   |                    |
+| Fields name | Subdata                        | Type   | Must | Description                                  |
+| ----------- | ------------------------------ | ------ | ---- | -------------------------------------------- |
+| currencies  | Configuration data of currency | String | YES  | Data of currency                             |
+|             | ——name                         | String | YES  | Currency name                                |
+|             | ——depositEnabled               | Bool   | YES  | Deposit status                               |
+|             | ——withdrawEnabled              | Bool   | YES  | Withdraw status                              |
+|             | ——meta                         | String | NO   |                                              |
+| symbols     | Configuration data of symbol   | String | NO   | onfiguration data of symbol                  |
+|             | ——name                         | String | YES  | Symbol                                       |
+|             | ——baseName                     | String | YES  | Base currency                                |
+|             | ——baseScale                    | Int    | YES  | Base currency display accuracy               |
+|             | ——baseMinimum                  | Float  | YES  | Minimum transaction volume of base currency  |
+|             | ——quoteName                    | String | YES  | Quote currency                               |
+|             | ——quoteScale                   | Int    | YES  | Quote currency display accuracy              |
+|             | ——quoteMinimum                 | Float  | YES  | Minimum transaction volume of quote currency |
+|             | ——startTime                    | Long   | NO   |                                              |
+|             | ——endTime                      | Long   | NO   |                                              |
+|             | ——meta                         | String | NO   |                                              |
 
 ```
 {
@@ -327,28 +330,28 @@ GET /v1/market/trades
 }
 ```
 
-#### 2. 获取手续费率
+#### 2. Get a commission rate
 
-请求：
+Request：
 
 ```
 GET /v1/market/feeRates
 ```
 
-响应：
+Response：
 
-数据字段：
+Data fields：
 
-| 字段名称          | 子数据                 | 类型   | 必须 | 描述                               |
-| ----------------- | ---------------------- | ------ | ---- | ---------------------------------- |
-| timestamp         |                        | String | YES  | 时间戳                             |
-| alwaysChargeQuote |                        | Bool   | YES  | 买单收取手续费是否以计价币种为单位 |
-| feeRates          | 交易对挂单吃单手续费率 | String | YES  | 交易对挂单吃单手续费率             |
-|                   | —交易对名称            | String | NO   | 交易对名称                         |
-|                   | —— takerFeeRate        | Float  | NO   | 吃单手续费率                       |
-|                   | —— makerFeeRate        | Float  | NO   | 挂单手续费率                       |
+| Field name        | Subdata                            | Type   | Must | Description                                                  |
+| ----------------- | ---------------------------------- | ------ | ---- | ------------------------------------------------------------ |
+| timestamp         |                                    | String | YES  |                                                              |
+| alwaysChargeQuote |                                    | Bool   | YES  | Whether the handling fee for the order is based on the quote currency |
+| feeRates          | Commission rate of maker and taker | String | YES  | Commission rate of maker and taker                           |
+|                   | —symbol                            | String | NO   | Symbol                                                       |
+|                   | —— takerFeeRate                    | Float  | NO   | Taker commission rate                                        |
+|                   | —— makerFeeRate                    | Float  | NO   | Maker commission rate                                        |
 
-响应示例：
+Response example：
 
 ```
 {
@@ -369,142 +372,144 @@ GET /v1/market/feeRates
 
 ---
 
-### 用户信息 - 需签名
+### Account information - need signature
 
-#### 1. 获取用户资产
+#### 1. Get user balance
 
-请求：
+Request：
 
 ```
 GET URL /v1/user/accounts
 ```
 
-响应：
+Response：
 
-字段数据：
+Data fields：
 
-| 字段信息  | 字段说明 |
-| --------- | -------- |
-| currency  | 币种     |
-| available | 可用     |
-| frozen    | 冻结     |
-| locked    | 锁定     |
+| Field name | Description       |
+| ---------- | ----------------- |
+| currency   | Currency name     |
+| available  | Available balance |
+| frozen     | Frozen balance    |
+| locked     | Locked balance    |
 
-响应：
+Response：
 
-数据字段：
+Data fields：
 
-| 字段名称 | 子数据       | 类型   | 必须 | 描述         |
-| -------- | ------------ | ------ | ---- | ------------ |
-| accounts | 账户资产数组 | String | YES  | 账户资产数组 |
-|          | —— currency  | String | YES  | 币种名称     |
-|          | —— available | Long   | YES  | 可用         |
-|          | —— frozen    | Long   | YES  | 冻结         |
-|          | —— locked    | Long   | YES  | 锁定         |
+| Field name | Subdata            | Type   | Must | Description        |
+| ---------- | ------------------ | ------ | ---- | ------------------ |
+| accounts   | Balance of account | String | YES  | Balance of account |
+|            | —— currency        | String | YES  | Currency name      |
+|            | —— available       | Long   | YES  | Available balance  |
+|            | —— frozen          | Long   | YES  | Frozen balance     |
+|            | —— locked          | Long   | YES  | Locked balance     |
 
-响应示例：
+Response example：
 
 ```
 {
-  	"accounts": [{
-  		"currency": "BTC",
-  		"available": 0.000025438348500000,
-  		"frozen": 0.18,
-  		"locked": 0
-  	}, {
-  		"currency": "ETH",
-  		"available": 0.321800000000000000,
-  		"frozen": 0.18,
-  		"locked": 0
-  	}]
+    "accounts": [{
+        "currency": "BTC",
+        "available": 0.000025438348500000,
+        "frozen": 0.18,
+        "locked": 0
+    }, {
+        "currency": "ETH",
+        "available": 0.321800000000000000,
+        "frozen": 0.18,
+        "locked": 0
+    }]
   }
 ```
 
 ---
 
-### 系统信息
+### System information 
 
-#### 1. 获取服务器时间戳
+#### 1. Get server timestamp
 
-请求：
+Request：
 
 ```
 GET /v1/market/timestamp
 ```
 
-响应：
+Response：
 
-数据字段：
+Data fields：
 
-| 字段名称  | 类型 | 必须 | 描述   |
-| --------- | ---- | ---- | ------ |
-| timestamp | Long | YES  | 时间戳 |
+| Field name | Type | Must | Description |
+| ---------- | ---- | ---- | ----------- |
+| timestamp  | Long | YES  | 时间戳      |
 
-响应示例：
+Response example：
 
 ```
 {
     "timestamp": 1546418387188
 }
+
 ```
 
 ---
 
-### 错误信息
+### Error information
 
-#### 1. 获取所有的错误码
+#### 1. Get all the error codes
 
-请求：
+Request：
 
 ```
 GET /v1/market/errorCodes
+
 ```
 
-响应：
+Response：
 
-数据字段：
+Data fields：
 
-| 字段名称                   | 类型   | 必须 | 描述                      |
-| -------------------------- | ------ | ---- | ------------------------- |
-| ACCOUNT_FREEZE_FAILED      | String | YES  | 账户冻结失败              |
-| ACCOUNT_UNFREEZE_FAILED    | String | YES  | 账户解除冻结失败          |
-| ADDRESS_CHECK_FAILED       | String | YES  | 地址检测失败              |
-| ADDRESS_INVALID            | String | YES  | 地址错误                  |
-| ADDRESS_MAXIMUM            | String | YES  | 地址超过最大数量          |
-| ADDRESS_NOT_ALLOWED        | String | YES  | 地址不被允许              |
-| AUTH_APIKEY_DISABLED       | String | YES  | 认证的 API KEY 被禁止     |
-| AUTH_APIKEY_INVALID        | String | YES  | 认证的 API KEY 非法       |
-| AUTH_AUTHORIZATION_EXPIRED | String | YES  | Authorization header 过期 |
-| AUTH_AUTHORIZATION_INVALID | String | YES  | Authorization header 错误 |
-| AUTH_GA_INVALID            | String | YES  | 认证谷歌验证码错误        |
-| AUTH_IP_FORBIDDEN          | String | YES  | IP 被禁止                 |
-| AUTH_SIGNATURE_INVALID     | String | YES  | 签名错误                  |
-| AUTH_SIGNIN_FAILED         | String | YES  | 登陆失败                  |
-| AUTH_SIGNIN_REQUIRED       | String | YES  | 需要登陆                  |
-| AUTH_USER_FORBIDDEN        | String | YES  | 用户被禁                  |
-| AUTH_USER_NOT_ACTIVE       | String | YES  | 用户未激活                |
-| DECRYPT_FAILED             | String | YES  | 解码失败                  |
-| DEPOSIT_CANCEL             | String | YES  | 充币取消                  |
-| DEPOSIT_FAILED             | String | YES  | 充币失败                  |
-| ENCRYPT_FAILED             | String | YES  | 编码失败                  |
-| HEADER_INVALID             | String | YES  | 请求头错误                |
-| INTERNAL_SERVER_ERROR      | String | YES  | 内部服务错误              |
-| OPERATION_FAILED           | String | YES  | 操作失败                  |
-| ORDER_CANNOT_CANCEL        | String | YES  | 订单无法取消              |
-| ORDER_NOT_FOUND            | String | YES  | 订单找不到                |
-| PARAMETER_INVALID          | String | YES  | 参数错误                  |
-| REQUEST_BODY_TOO_LARGE     | String | YES  | 请求体过大                |
-| RETRY_LATER                | String | YES  | 请稍候重试                |
-| SYSTEM_MAINTAIN            | String | YES  | 系统维护                  |
-| USER_CANNOT_SIGNIN         | String | YES  | 用户无法登陆              |
-| USER_CANNOT_TRADE          | String | YES  | 用户无法交易              |
-| USER_CANNOT_WITHDRAW       | String | YES  | 用户无法提币              |
-| USER_EMAIL_EXIST           | String | YES  | 用户邮箱已存在            |
-| USER_NOT_FOUND             | String | YES  | 未找到用户                |
-| WITHDRAW_DISABLED          | String | YES  | 提币禁止                  |
-| WITHDRAW_INVALID_STATUS    | String | YES  | 提币状态错误              |
+| Field name                 | Type   | Must | Description                    |
+| -------------------------- | ------ | ---- | ------------------------------ |
+| ACCOUNT_FREEZE_FAILED      | String | YES  | Account freeze failed          |
+| ACCOUNT_UNFREEZE_FAILED    | String | YES  | Account unfreeze failed        |
+| ADDRESS_CHECK_FAILED       | String | YES  | Address checked failed         |
+| ADDRESS_INVALID            | String | YES  | Invalid address                |
+| ADDRESS_MAXIMUM            | String | YES  | Address exceeds maximum number |
+| ADDRESS_NOT_ALLOWED        | String | YES  | Address is not allowed         |
+| AUTH_APIKEY_DISABLED       | String | YES  | Certified API KEY is disabled  |
+| AUTH_APIKEY_INVALID        | String | YES  | Certified API KEY is invalid   |
+| AUTH_AUTHORIZATION_EXPIRED | String | YES  | Authorization header expired   |
+| AUTH_AUTHORIZATION_INVALID | String | YES  | Authorization header invalid   |
+| AUTH_GA_INVALID            | String | YES  | Ga is invalid                  |
+| AUTH_IP_FORBIDDEN          | String | YES  | IP is forbidden                |
+| AUTH_SIGNATURE_INVALID     | String | YES  | Signature invalid              |
+| AUTH_SIGNIN_FAILED         | String | YES  | Sign in failed                 |
+| AUTH_SIGNIN_REQUIRED       | String | YES  | Request sign in first          |
+| AUTH_USER_FORBIDDEN        | String | YES  | User is forbidden              |
+| AUTH_USER_NOT_ACTIVE       | String | YES  | User not activated             |
+| DECRYPT_FAILED             | String | YES  | Decrypt failed                 |
+| DEPOSIT_CANCEL             | String | YES  | Deposit canceled               |
+| DEPOSIT_FAILED             | String | YES  | Deposit failed                 |
+| ENCRYPT_FAILED             | String | YES  | Encrypt failed                 |
+| HEADER_INVALID             | String | YES  | Header invalid                 |
+| INTERNAL_SERVER_ERROR      | String | YES  | Internal server error          |
+| OPERATION_FAILED           | String | YES  | Operation failed               |
+| ORDER_CANNOT_CANCEL        | String | YES  | Order cannot cancel            |
+| ORDER_NOT_FOUND            | String | YES  | Order not found                |
+| PARAMETER_INVALID          | String | YES  | Parameter invalid              |
+| REQUEST_BODY_TOO_LARGE     | String | YES  | Request body too large         |
+| RETRY_LATER                | String | YES  | Retry later                    |
+| SYSTEM_MAINTAIN            | String | YES  | System maintain                |
+| USER_CANNOT_SIGNIN         | String | YES  | User cannot sign in            |
+| USER_CANNOT_TRADE          | String | YES  | User cannot trade              |
+| USER_CANNOT_WITHDRAW       | String | YES  | User cannot withdraw           |
+| USER_EMAIL_EXIST           | String | YES  | User's email has been exist    |
+| USER_NOT_FOUND             | String | YES  | User not found                 |
+| WITHDRAW_DISABLED          | String | YES  | Withdraw disabled              |
+| WITHDRAW_INVALID_STATUS    | String | YES  | Withdraw status invalid        |
 
-响应示例：
+Response example：
 
 ```
 {
@@ -548,25 +553,26 @@ GET /v1/market/errorCodes
 }
 ```
 
-#### 2. 错误响应示例
 
-请求：
+#### 2. Error example
+
+Request：
 
 ```
 GET /v1/market/error
 ```
 
-响应：
+Response：
 
-字段数据：
+Data fields：
 
-| 字段名称 | 类型   | 必须 | 描述     |
-| -------- | ------ | ---- | -------- |
-| error    | String | YES  | 错误提示 |
-| data     | String | YES  | 数据     |
-| message  | String | YES  | 错误信息 |
+| Field name | Type   | Must | Description |
+| ---------- | ------ | ---- | ----------- |
+| error      | String | YES  |             |
+| data       | String | YES  |             |
+| message    | String | YES  |             |
 
-响应数据：
+Response example：
 
 ```
 {
@@ -574,39 +580,42 @@ GET /v1/market/error
     "data": "testField",
     "message": "Test error message"
 }
+
 ```
 
 ---
 
-### 订单 - 需签名
+### Trading - need signature
 
-订单接口用于创建 / 查询 / 撤销订单。除非返回了一个错误，任何订单接口都需要进行接口签名。
+The trading APIs are used to create new orders, fetch exist orders, cancel orders.
 
-#### 1. 创建订单
+A valid API signature is required when invoke order APIs, otherwise an error returned.
 
-请求：
+#### 1. Create a new order
+
+Request：
 
 ```
 POST /v1/trade/orders
 ```
 
-参数：
+Parameters：
 
-| 字段名称          | 类型   | 必须 | 描述                                                         |
-| ----------------- | ------ | ---- | ------------------------------------------------------------ |
-| type              | String | YES  | 订单类型：`BUY_LIMIT, SELL_LIMIT, BUY_MARKET, SELL_MARKET`   |
-| source            | String | 可选 | 下单来源："WEB", "API", "APP"                                |
-| symbol            | String | YES  | 交易对标识符                                                 |
-| price             | Float  | YES  | 订单类型为 `BUY_LIMIT / SELL_LIMIT / BUY_MARKET` 时必须，限价单时是价格，市价单时是要花费的总金额 |
-| amount            | Float  | YES  | 订单类型为 `BUY_LIMIT / SELL_LIMIT / SELL_MARKET` 时必须。为交易数量。 |
-| triggerOn         | Float  | 可选 | 当市价达到此价格时执行此订单                                 |
-| fillOrKill        | Bool   | 可选 | 「Fill or Kill」（FOK）订单是一笔必须全部完成或者取消的限价订单。它的目的是确保立即以特定价格输入头寸。 默认为false |
-| immediateOrCancel | Bool   | 可选 | 「immediate or cancel」订单是一笔立即执行的限价订单，如果这笔订单有部分未成交，那这部分会被取消。默认为 false |
-| postOnly          | Bool   | 可选 | 「Post Only」限价订单使得用户确保订单是挂单。它只能被加入订单表或者取消（仅限限价订单）。默认是 false |
-| hidden            | Bool   | 可选 | 这个字段允许发布隐藏显示的订单，它不会被其他交易者看到。价格和时间的优先级与显示的订单相同（仅限限价单）。默认是 false |
-| trailingStop      | Bool   | 可选 | 止损订单通过价格差，在市场达到用户预先设置的价格时停止订单。保证金交易时，可以使用止损卖单来保证利润。如果设置了止损，`triggerOn` 字段被视为止损价格差而不是触发价格。默认为 false |
+| Parameter         | Type   | Must     | Description                                                  |
+| ----------------- | ------ | -------- | ------------------------------------------------------------ |
+| type              | String | YES      | Order type：`BUY_LIMIT, SELL_LIMIT, BUY_MARKET, SELL_MARKET` |
+| source            | String | OPTIONAL | Order source："WEB", "API", "APP"                            |
+| symbol            | String | YES      | Symbol                                                       |
+| price             | Float  | YES      | This field refer to price of the asset for BUY_LIMIT or SELL_LIMIT. but refer to total spend money for BUY_MARKET. |
+| amount            | Float  | YES      | REQUIRED for BUY_LIMIT, SELL_LIMIT and SELL_MARKET. This field refer to amount of the asset to buy or sell. |
+| triggerOn         | Float  | OPTIONAL | This order will be executed when market price reaches        |
+| fillOrKill        | Bool   | OPTIONAL | A "Fill or Kill" (FOK) order is a limit order that must be filled immediately  in its entirety or it is cancelled (killed). The purpose of a fill-or-kill order is to ensure that a position is entered instantly and at a specific price. Default to false. |
+| immediateOrCancel | Bool   | OPTIONAL | An immediate or cancel order (IOC) is an order that must be executed immediately, and any portion of the order that cannot be immediately filled is cancelled (only for limit orders). Default to false. |
+| postOnly          | Bool   | OPTIONAL | "Post Only" limit orders are orders that allow you to be sure to always be maker. When placed, a "Post Only" limit order is either inserted into the order book or cancelled (only for limit orders). Default to false. |
+| hidden            | Bool   | OPTIONAL | This field allows you to place an order into the book but not have it displayed to other traders. Price/time priority is the same as a displayed order (only for limit orders). Default to false. |
+| trailingStop      | Bool   | OPTIONAL | A trailing stop order provides flexibility over a stop order by executing once the market goes against you by a defined price, called the price distance. When margin trading, a trailing stop sell order can be used to protect profit. If trailing is true, the property of "triggerOn" is trailing distance NOT the trigger price. Default to false. |
 
-请求数据：
+Request data：
 
 ```
 {
@@ -624,163 +633,163 @@ POST /v1/trade/orders
 }
 ```
 
-响应：
+Response：
 
-字段数据：
+Data fields：
 
-| 字段名称      | 类型   | 必须 | 描述                                                         |
+| Field name    | Type   | Must | Description                                                  |
 | ------------- | ------ | ---- | ------------------------------------------------------------ |
-| createdAt     | Long   | Y    | 创建时间                                                     |
-| updatedAt     | Long   | Y    | 更新时间                                                     |
+| createdAt     | Long   | Y    | Create time                                                  |
+| updatedAt     | Long   | Y    | Update time                                                  |
 | seqId         | Int    | Y    |                                                              |
 | previousSeqId | Int    | Y    |                                                              |
 | refOrderId    | Int    | Y    |                                                              |
 | refSeqId      | Int    | Y    |                                                              |
-| userId        | Int    | Y    | 用户 ID                                                      |
-| source        | String | Y    | 下单来源                                                     |
-| symbol        | String | Y    | 交易对                                                       |
+| userId        | Int    | Y    | User ID                                                      |
+| source        | String | Y    | Order source                                                 |
+| symbol        | String | Y    |                                                              |
 | sequenceIndex | Int    | Y    |                                                              |
-| type          | String | Y    | 订单类型                                                     |
-| price         | Float  | Y    | 价格                                                         |
-| amount        | Float  | Y    | 数量                                                         |
-| filledAmount  | Float  | Y    | 成交数量                                                     |
-| fee           | Float  | Y    | 手续费                                                       |
-| triggerOn     | Float  | Y    | 0 代表未停止的订单                                           |
-| makerFeeRate  | Long   | Y    | 挂单手续费率                                                 |
-| takerFeeRate  | Long   | Y    | 吃单手续费率                                                 |
-| chargeQuote   | Bool   | Y    | 买时是否预先扣手续费，即手续费以计价币种为单位               |
-| features      | Int    | Y    | 订单特性，组成：`FILL_OR_KILL = 0x0001；POST_ONLY = 0x0010；HIDDEN = 0x0100；IMMEDIATE_OR_CANCEL = 0x1000；TRAILING_STOP = 0x10000000000；` |
-| status        | String | Y    | 订单状态                                                     |
-| id            | Int    | Y    | 订单 ID                                                      |
-| feeCurrency   | String | Y    | 手续费收取币种                                               |
+| type          | String | Y    | Order type: valid constants: BUY_LIMIT, SELL_LIMIT, BUY_MARKET, SELL_MARKET |
+| price         | Float  | Y    | Price                                                        |
+| amount        | Float  | Y    | Amount                                                       |
+| filledAmount  | Float  | Y    | Filled amount (already done)                                 |
+| fee           | Float  | Y    | Order fee                                                    |
+| triggerOn     | Float  | Y    | 0 = not a stop order                                         |
+| makerFeeRate  | Long   | Y    | Fee rate for maker                                           |
+| takerFeeRate  | Long   | Y    | Fee rate for taker                                           |
+| chargeQuote   | Bool   | Y    | Charge fee as quote currency when buy                        |
+| features      | Int    | Y    | Order features combined with:：`FILL_OR_KILL = 0x0001；POST_ONLY = 0x0010；HIDDEN = 0x0100；IMMEDIATE_OR_CANCEL = 0x1000；TRAILING_STOP = 0x10000000000；` |
+| status        | String | Y    | order status: `SUBMITTED`: just submitted, waiting for sequencing;`SEQUENCED`: waiting for processing or processing now;`FULLY_FILLED`: completely filled;`FULLY_CANCELLED`: completely cancelled (nothing bought or sold);`PARTIAL_CANCELLED`: partial cancelled (not fully bought or sold) |
+| id            | Int    | Y    | Order ID                                                     |
+| feeCurrency   | String | Y    | Order fee currency                                           |
 
-响应数据：
+Response example：
 
 ```
 {
-	"createdAt": 1546511983069,
-	"updatedAt": 1546511983069,
-	"seqId": 0,
-	"previousSeqId": 0,
-	"refOrderId": 0,
-	"refSeqId": 0,
-	"userId": 10063,
-	"source": "",
-	"symbol": "BTC_USDT",
-	"sequenceIndex": 1,
-	"type": "BUY_LIMIT",
-	"price": 1,
-	"amount": 1,
-	"filledAmount": 0,
-	"fee": 0,
-	"triggerOn": 0,
-	"makerFeeRate": -0.000500000000000000,
-	"takerFeeRate": 0.001000000000000000,
-	"chargeQuote": true,
-	"features": 0,
-	"status": "SUBMITTED",
-	"id": 1875418,
-	"feeCurrency": "USDT"
+    "createdAt": 1546511983069,
+    "updatedAt": 1546511983069,
+    "seqId": 0,
+    "previousSeqId": 0,
+    "refOrderId": 0,
+    "refSeqId": 0,
+    "userId": 10063,
+    "source": "",
+    "symbol": "BTC_USDT",
+    "sequenceIndex": 1,
+    "type": "BUY_LIMIT",
+    "price": 1,
+    "amount": 1,
+    "filledAmount": 0,
+    "fee": 0,
+    "triggerOn": 0,
+    "makerFeeRate": -0.000500000000000000,
+    "takerFeeRate": 0.001000000000000000,
+    "chargeQuote": true,
+    "features": 0,
+    "status": "SUBMITTED",
+    "id": 1875418,
+    "feeCurrency": "USDT"
 }
 ```
 
-#### 2. 查询指定订单
+#### 2. Get exist orders
 
-请求：
+Request：
 
 ```
 GET /v1/trade/orders/<the-order-id>
 ```
 
-参数：
+Parameters：
 
-| 位置           | 类型   | 必须 | 描述    |
-| -------------- | ------ | ---- | ------- |
-| <the-order-id> | String | YES  | 订单 ID |
+| Parameter      | Type   | Must | Description |
+| -------------- | ------ | ---- | ----------- |
+| <the-order-id> | String | YES  | 订单 ID     |
 
-响应：
+Response：
 
-| 字段名称     | 类型   | 必须 | 描述                                                         |
+| Field name   | Type   | Must | Description                                                  |
 | ------------ | ------ | ---- | ------------------------------------------------------------ |
-| id           | String | YES  | 订单 ID                                                      |
-| userId       | Int    | YES  | 用户 ID                                                      |
-| symbol       | String | YES  | 交易对                                                       |
-| status       | String | YES  | `SUBMITTED`: 刚提交；`SEQUENCED`: 等待处理或者正在处理；`FULLY_FILLED`: 完全成交；`FULLY_CANCELLED`: 完全撤销；`PARTIAL_CANCELLED`:部分撤销 |
-| type         | String | YES  | 订单类型                                                     |
+| id           | String | YES  | Order ID                                                     |
+| userId       | Int    | YES  | User ID                                                      |
+| symbol       | String | YES  | Symbol                                                       |
+| status       | String | YES  | `order status: `SUBMITTED`: just submitted, waiting for sequencing;`SEQUENCED`: waiting for processing or processing now;`FULLY_FILLED`: completely filled;`FULLY_CANCELLED`: completely cancelled (nothing bought or sold);`PARTIAL_CANCELLED`: partial cancelled (not fully bought or sold) |
+| type         | String | YES  | Order type: valid constants: BUY_LIMIT, SELL_LIMIT, BUY_MARKET, SELL_MARKET |
 | price        | Float  | YES  | 价格                                                         |
-| amount       | Float  | YES  | 数量                                                         |
-| filledAmount | Long   | YES  | 成交数量                                                     |
-| features     | Int    | YES  | 订单特性，组成：`FILL_OR_KILL = 0x0001；POST_ONLY = 0x0010；HIDDEN = 0x0100；IMMEDIATE_OR_CANCEL = 0x1000；TRAILING_STOP = 0x10000000000` |
-| feeCurrency  | String | YES  | 交易收取的手续费币种                                         |
-| fee          | Long   | YES  | 手续费                                                       |
-| triggerOn    | Long   | YES  | 0 代表未停止的订单                                           |
-| makerFeeRate | Long   | YES  | 挂单手续费率                                                 |
-| takerFeeRate | Long   | YES  | 吃单手续费率                                                 |
-| chargeQuote  | Bool   | YES  | 买时是否预先扣手续费，即手续费以计价币种为单位               |
-| source       | String | YES  | 订单来源                                                     |
-| createdAt    | Long   | YES  | 订单请求事件                                                 |
-| updatedAt    | Long   | YES  | 订单最后更新时间                                             |
+| amount       | Float  | YES  | Amount                                                       |
+| filledAmount | Long   | YES  | Filled amount (already done)                                 |
+| features     | Int    | YES  | Order features combined with:：`FILL_OR_KILL = 0x0001；POST_ONLY = 0x0010；HIDDEN = 0x0100；IMMEDIATE_OR_CANCEL = 0x1000；TRAILING_STOP = 0x10000000000；` |
+| feeCurrency  | String | YES  | Order fee currency                                           |
+| fee          | Long   | YES  | Order fee                                                    |
+| triggerOn    | Long   | YES  | 0 = not a stop order                                         |
+| makerFeeRate | Long   | YES  | Fee rate for maker                                           |
+| takerFeeRate | Long   | YES  | Fee rate for taker                                           |
+| chargeQuote  | Bool   | YES  | Charge fee as quote currency when buy                        |
+| source       | String | YES  | Order source                                                 |
+| createdAt    | Long   | YES  | Create time                                                  |
+| updatedAt    | Long   | YES  | Update time                                                  |
 
-响应数据示例：
+Response example：
 
 ```
 {
-	"createdAt": 1546511983069,
-	"updatedAt": 1546511983076,
-	"seqId": 1775419,
-	"previousSeqId": 1775418,
-	"refOrderId": 0,
-	"refSeqId": 0,
-	"userId": 10063,
-	"source": "",
-	"symbol": "BTC_USDT",
-	"sequenceIndex": 1,
-	"type": "BUY_LIMIT",
-	"price": 1.000000000000000000,
-	"amount": 1.000000000000000000,
-	"filledAmount": 0E-18,
-	"fee": 0E-18,
-	"triggerOn": 0E-18,
-	"makerFeeRate": -0.000500000000000000,
-	"takerFeeRate": 0.001000000000000000,
-	"chargeQuote": true,
-	"features": 0,
-	"status": "SEQUENCED",
-	"id": 1875418,
-	"feeCurrency": "USDT"
+    "createdAt": 1546511983069,
+    "updatedAt": 1546511983076,
+    "seqId": 1775419,
+    "previousSeqId": 1775418,
+    "refOrderId": 0,
+    "refSeqId": 0,
+    "userId": 10063,
+    "source": "",
+    "symbol": "BTC_USDT",
+    "sequenceIndex": 1,
+    "type": "BUY_LIMIT",
+    "price": 1.000000000000000000,
+    "amount": 1.000000000000000000,
+    "filledAmount": 0E-18,
+    "fee": 0E-18,
+    "triggerOn": 0E-18,
+    "makerFeeRate": -0.000500000000000000,
+    "takerFeeRate": 0.001000000000000000,
+    "chargeQuote": true,
+    "features": 0,
+    "status": "SEQUENCED",
+    "id": 1875418,
+    "feeCurrency": "USDT"
 }
 ```
 
-#### 3. 查询所有订单
+#### 3. Get exist orders
 
-请求：
+Request：
 
 ```
 GET /v1/trade/orders<?><symbol=symbol><&offsetId=order-id><&limit=limit>
 ```
 
-参数：
+Parameters：
 
-| 参数名称 | 类型   | 必须 | 描述                                                         |
-| -------- | ------ | ---- | ------------------------------------------------------------ |
-| symbol   | String | NO   | 交易对标识符。如果指定了该参数，则返回对应交易对的数据。默认为空。 |
-| offsetId | String | NO   | 开始偏移的订单 ID。如果指定了该参数，返回从该 ID 开始的订单。默认为 0。 |
-| limit    | String | NO   | 返回订单的最大量。如果指定了该参数，返回最多为该数值的订单量。默认为 100。 |
+| Parameter | Type   | Must | Description                                                  |
+| --------- | ------ | ---- | ------------------------------------------------------------ |
+| symbol    | String | NO   | Optional, return orders only with specified symbol. Default to empty string. |
+| offsetId  | String | NO   | Optional, return orders starts with specified order id. Default to 0. |
+| limit     | String | NO   | Optional, return maximum number of orders. Default to 100.   |
 
-示例：
+Example:
 
 ```
-获取最新的 5 条 BTC_USDT 交易对的订单
+Get latest 5 orders for BTC_USDT:
 GET /v1/trade/orders?symbol=BTC_USDT&limit=5
 ```
 
-响应：
+Response：
 
-| 字段名称     | 子数据   | 类型   | 必须 | 描述                                                         |
-| ------------ | -------- | ------ | ---- | ------------------------------------------------------------ |
-| hasMore      |          | Bool   | YES  | 是否有更多数据                                               |
-| nextOffsetId |          | Int    | YES  | 下一页订单数据的 ID 偏移量，如 `GET /v1/trade/orders?symbol=BTC_USDT&offsetId=909971&limit=5` |
-| orders       | 订单数组 | String | YES  | 订单数组，同接口 `GET /v1/trade/orders/<the-order-id>`       |
+| Field name   | Subdata | Type   | Must | Description                                                  |
+| ------------ | ------- | ------ | ---- | ------------------------------------------------------------ |
+| hasMore      |         | Bool   | YES  | Is there more data                                           |
+| nextOffsetId |         | Int    | YES  | Offset id of next page，如 `GET /v1/trade/orders?symbol=BTC_USDT&offsetId=909971&limit=5` |
+| orders       | Orders  | String | YES  | Orders array                                                 |
 
 ```
 {
@@ -788,115 +797,115 @@ GET /v1/trade/orders?symbol=BTC_USDT&limit=5
   "nextOffsetId": 909971, 
   "orders": [
     {
-		"createdAt": 1546511983069,
-		"updatedAt": 1546511983076,
-		"seqId": 1775419,
-		"previousSeqId": 1775418,
-		"refOrderId": 0,
-		"refSeqId": 0,
-		"userId": 10063,
-		"source": "",
-		"symbol": "BTC_USDT",
-		"sequenceIndex": 1,
-		"type": "BUY_LIMIT",
-		"price": 1.000000000000000000,
-		"amount": 1.000000000000000000,
-		"filledAmount": 0E-18,
-		"fee": 0E-18,
-		"triggerOn": 0E-18,
-		"makerFeeRate": -0.000500000000000000,
-		"takerFeeRate": 0.001000000000000000,
-		"chargeQuote": true,
-		"features": 0,
-		"status": "SEQUENCED",
-		"id": 1875418,
-		"feeCurrency": "USDT"
-	}, {
-		"createdAt": 1546422391673,
-		"updatedAt": 1546422391688,
-		"seqId": 1473289,
-		"previousSeqId": 1473288,
-		"refOrderId": 0,
-		"refSeqId": 0,
-		"userId": 10063,
-		"source": "",
-		"symbol": "BTC_USDT",
-		"sequenceIndex": 1,
-		"type": "SELL_LIMIT",
-		"price": 3758.000000000000000000,
-		"amount": 0.100000000000000000,
-		"filledAmount": 0.100000000000000000,
-		"fee": 0.375800000000000000,
-		"triggerOn": 0E-18,
-		"makerFeeRate": -0.000500000000000000,
-		"takerFeeRate": 0.001000000000000000,
-		"chargeQuote": true,
-		"features": 0,
-		"status": "FULLY_FILLED",
-		"id": 1573288,
-		"feeCurrency": "USDT"
-	}
+        "createdAt": 1546511983069,
+        "updatedAt": 1546511983076,
+        "seqId": 1775419,
+        "previousSeqId": 1775418,
+        "refOrderId": 0,
+        "refSeqId": 0,
+        "userId": 10063,
+        "source": "",
+        "symbol": "BTC_USDT",
+        "sequenceIndex": 1,
+        "type": "BUY_LIMIT",
+        "price": 1.000000000000000000,
+        "amount": 1.000000000000000000,
+        "filledAmount": 0E-18,
+        "fee": 0E-18,
+        "triggerOn": 0E-18,
+        "makerFeeRate": -0.000500000000000000,
+        "takerFeeRate": 0.001000000000000000,
+        "chargeQuote": true,
+        "features": 0,
+        "status": "SEQUENCED",
+        "id": 1875418,
+        "feeCurrency": "USDT"
+    }, {
+        "createdAt": 1546422391673,
+        "updatedAt": 1546422391688,
+        "seqId": 1473289,
+        "previousSeqId": 1473288,
+        "refOrderId": 0,
+        "refSeqId": 0,
+        "userId": 10063,
+        "source": "",
+        "symbol": "BTC_USDT",
+        "sequenceIndex": 1,
+        "type": "SELL_LIMIT",
+        "price": 3758.000000000000000000,
+        "amount": 0.100000000000000000,
+        "filledAmount": 0.100000000000000000,
+        "fee": 0.375800000000000000,
+        "triggerOn": 0E-18,
+        "makerFeeRate": -0.000500000000000000,
+        "takerFeeRate": 0.001000000000000000,
+        "chargeQuote": true,
+        "features": 0,
+        "status": "FULLY_FILLED",
+        "id": 1573288,
+        "feeCurrency": "USDT"
+    }
   ]
 }
 ```
 
-#### 4. 查询未完成订单
+#### 4. Get exist active orders
 
-请求接口为：`/v1/trade/orders/active`，其余同上。
+To get exist active orders (orders that are not been fully-filled or cancelled, in other words, orders are still in order book) is the same as get exist orders, but the url is `/v1/trade/orders/active`.
 
-#### 5. 撤销订单
+#### 5. Cancel order
 
-请求：
+Request：
 
 ```
 POST /v1/trade/orders/<order-id>/cancel
 ```
 
-参数：
+Parameters：
 
-| 位置       | 类型 | 必须 | 描述            |
-| ---------- | ---- | ---- | --------------- |
-| <order-id> | Int  | YES  | 要撤销的订单 ID |
+| Parameter  | Type | Must | Description                                    |
+| ---------- | ---- | ---- | ---------------------------------------------- |
+| <order-id> | Int  | YES  | the specified order id that will be cancelled. |
 
-响应：
+Response：
 
-返回数据，同接口 `GET /v1/trade/orders/<the-order-id>`：
+Response example，as `GET /v1/trade/orders/<the-order-id>`：
 
 ```
 {
-	"createdAt": 1546513666060,
-	"updatedAt": 1546513666060,
-	"seqId": 0,
-	"previousSeqId": 0,
-	"refOrderId": 1875418,
-	"refSeqId": 1775419,
-	"userId": 10063,
-	"source": "CANCEL",
-	"symbol": "BTC_USDT",
-	"sequenceIndex": 1,
-	"type": "CANCEL_BUY",
-	"price": 1.000000000000000000,
-	"amount": 0,
-	"filledAmount": 0,
-	"fee": 0,
-	"triggerOn": 0E-18,
-	"makerFeeRate": 0,
-	"takerFeeRate": 0,
-	"chargeQuote": true,
-	"features": 0,
-	"status": "SUBMITTED",
-	"id": 1875420,
-	"feeCurrency": "USDT"
+    "createdAt": 1546513666060,
+    "updatedAt": 1546513666060,
+    "seqId": 0,
+    "previousSeqId": 0,
+    "refOrderId": 1875418,
+    "refSeqId": 1775419,
+    "userId": 10063,
+    "source": "CANCEL",
+    "symbol": "BTC_USDT",
+    "sequenceIndex": 1,
+    "type": "CANCEL_BUY",
+    "price": 1.000000000000000000,
+    "amount": 0,
+    "filledAmount": 0,
+    "fee": 0,
+    "triggerOn": 0E-18,
+    "makerFeeRate": 0,
+    "takerFeeRate": 0,
+    "chargeQuote": true,
+    "features": 0,
+    "status": "SUBMITTED",
+    "id": 1875420,
+    "feeCurrency": "USDT"
 }
 ```
 
-注意：
+Note：
 
-- 撤单结果决定于订单类型和当前订单状态。
-- 无法撤销市价单，或者已经完成的订单。
-- 无法撤销「已经撤销」或者「部分撤销」的订单。
+- the cancel result depends on order types and exist order status.
+- You cannot cancel a market order, or an order with status `FULLY_FILLED`.
+- You cannot re-cancel an order with status `FULLY_CANCELLED` or `PARTIAL_CANCELLED`.
 
-错误消息：
+You will get error response if cancel failed:：
 
 ```
 {
@@ -907,40 +916,40 @@ POST /v1/trade/orders/<order-id>/cancel
 
 ---
 
-## API 签名算法
+## API Signature
 
-### 处理步骤
+### Processing steps
 
-1. 整理请求数据格式
-2. 签名
+1. Organize request data format
+2. Signature
 
-#### 1.1 数据格式
+#### 1.1 Data Format
 
-数据包含：
+Data contains：
 
-- 方法名称：`GET` 或 `POST`
-- 请求域名：例如`api.bitzon.com`
-- 请求路径：以 `/` 开头的 `URI`，例如：`/v1/trade/orders`
-- 请求参数：以`key1=value2&key2=value2`形式的参数，例如：`id=123456&sort=DESC&from=2017-09-10`
-- 请求Header：例如，`Accept: */*`
-- 请求 `Body`：二进制表示的 `JSON` 字符串，仅针对 `POST` 有效
+- Request method：`GET` or `POST`
+- Request amain: e.g. `api.bitzon.com`
+- Request path：a URI starting with `/`, for example: `/v1/trade/orders`
+- Request parameters：The parameter in the form of `key1=value2&key2=value2`, for example: `id=123456&sort=DESC&from=2017-09-10`
+- Request Header：e.g. `Accept: */*`
+- Request  `Body`：JSON string in binary representation, valid only for POST
 
-数据格式：
+Data Format：
 
-| 除了请求体，其余后面都有换行符「\n」  | 释义                                                         |
-| ------------------------------------- | ------------------------------------------------------------ |
-| GET\n                                 | 请求方法，全部大写                                           |
-| api.bitzon.com\n                      | 请求域名，全部小写                                           |
-| /v1/trade/orders\n                    | 请求路径，严格大小写                                         |
-| from=2017-09-10&id=123456&sort=DESC\n | 请求参数，字典序拼接，严格大小写，如果没有参数，直接「 \n」  |
-| API-KEY: xyz123456\n                  | 「API-」开头的请求头，与签名相关。HEADER 全大写，冒号后面空格，VALUE 严格大小写。key 值 |
-| API-SIGNATURE-METHOD: HmacSHA256\n    | 「API-」开头的请求头，与签名相关。HEADER 全大写，冒号后面空格，VALUE 严格大小写。加密算法 |
-| API-SIGNATURE-VERSION: 1\n            | 「API-」开头的请求头，与签名相关。HEADER 全大写，冒号后面空格，VALUE 严格大小写。版本号 |
-| API-TIMESTAMP: 12300000000\n          | 「API-」开头的请求头，与签名相关。HEADER 全大写，冒号后面空格，VALUE 严格大小写。时间戳 |
-| API-UNIQUE-ID: uni-123-abc-xyz\n      | 「API-」开头的请求头，与签名相关。HEADER 全大写，冒号后面空格，VALUE 严格大小写。ID |
-| <json body data>                      | 如果是 POST 请求，且含有 BODY，BODY 数据格式为 json 字符串   |
+| n addition to the request body, there are newline characters "\n" after the rest | Description                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| GET\n                                                        | Request method. All uppercase                                |
+| api.bitzon.com\n                                             | Request domain. All lowercase                                |
+| /v1/trade/orders\n                                           | Request path，Strict case                                    |
+| from=2017-09-10&id=123456&sort=DESC\n                        | Request parameters，sorted alphabetically，Strict case，if no parameters，just「 \n」 |
+| API-KEY: xyz123456\n                                         | The request header at the beginning of "API-" is related to the signature. HEADER is all uppercase, spaces after the colon, and VALUE is strictly case sensitive. Key value. |
+| API-SIGNATURE-METHOD: HmacSHA256\n                           | The request header at the beginning of "API-" is related to the signature. HEADER is all uppercase, spaces after the colon, and VALUE is strictly case sensitive. Encryption Algorithm |
+| API-SIGNATURE-VERSION: 1\n                                   | The request header at the beginning of "API-" is related to the signature. HEADER is all uppercase, spaces after the colon, and VALUE is strictly case sensitive. version number |
+| API-TIMESTAMP: 12300000000\n                                 | The request header at the beginning of "API-" is related to the signature. HEADER is all uppercase, spaces after the colon, and VALUE is strictly case sensitive. Timestamp |
+| API-UNIQUE-ID: uni-123-abc-xyz\n                             | The request header at the beginning of "API-" is related to the signature. HEADER is all uppercase, spaces after the colon, and VALUE is strictly case sensitive. ID |
+| <json body data>                                             | If it is a `POST` request and contains `BODY`, the `BODY` data format is a json string. |
 
-请求示例：
+Request example：
 
 ```
 GET\n
@@ -955,39 +964,39 @@ API-UNIQUE-ID: uni-123-abc-xyz\n
 <json body data>
 ```
 
-#### 1.2 签名
+#### 1.2 signature
 
- 将 1.1 步的请求字符串按 `UTF-8` 编码，得到一个二进制  `byte` 数组，然后使用 `API Secret` 计算 `Signature`:
+ Encode the 1.1-step request string in UTF-8 to get a binary byte array, then use the API Secret to calculate the Signature:
 
 ```
 signature = HmacSHA256(payload.encode("UTF-8"), "my-api-secret")
 ```
 
-将所得签名以十六进制小写字符串形式添加到 `Header`：
+Add the resulting signature to the Header as a hexadecimal lowercase string:
 
 ```
 API-Signature: a1b2c3ff001234500900dd01ff
 ```
 
-### 说明
+### Description
 
-1. 参数使用原始字符串计算签名，例如`a=1/5`，不要使用`a=1%2F5`
-2. `Header` 在计算签名时使用全大写，发送时大小写均可
-3. 只有以`API-`开头的 `Header` 才被列入并计算签名（`API-Signature`除外，因为最后才能计算出 `API-Signature` 并附加到请求）
-4. `API-Signature-Method` 必须为`HmacSHA256`
-5. `API-Signature-Version` 必须为`1`
-6. `API-Timestamp` 为当前时间戳，单位为毫秒整数，不支持小数，误差不得超过1分钟
-7. `API-Unique-ID` 为可选，如果提供，则客户端需要提供一个唯一字符串标识，推荐 `UUID` 或自增序列 
-8. 带 `Body` 的请求，需要先序列化为 `JSON` 字符串，然后把 `Body` 列入计算签名。不要对一个对象使用两次序列化，因为某些语言的实现可能导致两次序列化的 `JSON` 不一样，例如，`{"a":true, "b":1}`和`{"b":1, "a":true}`，两者 `JSON` 内容一致但字符串不同，将导致验证签名失败。
+1. The parameter uses the original string to calculate the signature, for example `a=1/5`, don't use `a=1%2F5`
+2. `Header` uses all uppercase when calculating signatures, and does not require it when sending
+3. Only Headers starting with 'API-' are included and calculated for signatures (except `API-Signature`, because `API-Signature` can be calculated and appended to the request)
+4. `API-Signature-Method` must be `HmacSHA256`
+5. `API-Signature-Version` must be `1`
+6. `API-Timestamp`  is the current timestamp, in milliseconds. It does not support decimals, and the error cannot exceed 1 minute.
+7. `API-Unique-ID` Optional, if provided, the client needs to provide a unique string identifier, recommend `UUID` or auto-sequence
+8. A request with a `Body` needs to be serialized as a `JSON` string and then the `Body` is included in the computed signature. Don't use serialization twice for an object, because implementations in some languages may cause two serialized `JSON`s to be different, for example, `{"a":true, "b":1}`, and `{"b":1, "a": true}`, the two `JSON` contents are the same but the strings are different, which will cause the verification signature to fail.
 
 
 ---
 
 ## WebSocket
 
-用于获取市场事件。
+WebSocket API is used for receiving market events.
 
-### 如何连接 WebSocket
+## How to connect to WebSocket
 
 `URL: wss://wss.bitzon.com/v1/market/notification`
 
@@ -995,24 +1004,27 @@ API-Signature: a1b2c3ff001234500900dd01ff
 var ws = new WebSocket('wss://wss.bitzon.com/v1/market/notification');
 ```
 
-连接成功之后，所有的数据的收发都是 `JSON` 字符串的形式。
+After connected successfully, all messages are sent / received as JSON string.
 
-在连接之后需要立刻发送一条订阅消息：
+A subscription message need to be sent immediately after connected:
 
 ```
 var msg = JSON.stringify({"action": "subscribe", "symbol": "BTC_USDT"});
 ws.send(msg);
+
 ```
 
-订阅之后，关于 `BTC_USDT` 交易对的所有市场事件都会被 `WebSocket` 立刻推送。
+All market events with `BTC_USDT` will be sent by this `WebSocket` later.
 
-- 注意，该条信息必须是 **`JSON` 字符串** 而不是一个对象。
+- Note，message MUST be JSON-string (not object).
 
-如果想要绘制市场图表，首先要通过 REST API 来获取历史数据，之后的最新数据则会被 WebSocket 推送。
+To draw market chart, the first step is request history bar data by REST API.
 
-### 如何处理 WebSocket 信息
+And later changed bars are pushed by WebSocket.
 
-从 WebSocket 获取的消息都是 `JSON` 字符串形式。下面是 `JavaScript` 代码示例：
+## How to handle WebSocket message
+
+All messages received from `WebSocket` are JSON-string. Here is example  `JavaScript` code:
 
 ```
 ws.onmessage = function (event) {
@@ -1037,27 +1049,24 @@ ws.onmessage = function (event) {
         }
     }
 };
-```
-
-### Topics - 主题
-
-1. `topic_snapshot`: 交易对深度图
-
-1. `topic_tick`: 全部市场行情数据。
-
-1. `topic_bar`: K 线数据
-
-1. `topic_order`: 订单实时数据
-
-### K 线数据格式
-
-包含六个元素的数组：
 
 ```
-[时间戳 timestamp in millis, 开盘价 open price, 最高价 high price, 最低价 low price, 收盘价 close price, 交易量 volume]
 
-如 [1544602783000, 3302.1, 3419.9, 3029.6, 3298, 9.34]
+### Topics
+
+1. `topic_snapshot`: the order book snapshot data;
+2. `topic_tick`: the tick data.
+3. `topic_bar`:  the bar data.
+4. `topic_order`: the order execution data.
+
+## Bar data format
+
+All bar data is represented as array that contains 6 elements which are:
+
+[timestamp in millis, open price, high price, low price, close price, volume]
+
+Example:
+
 ```
-
-
-
+[1544602783000, 3302.1, 3419.9, 3029.6, 3298, 9.34]
+```
