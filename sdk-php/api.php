@@ -14,6 +14,29 @@ class Api{
         $this->secret_key = $secret_key;
     }
 
+    public function getMatchresults($symbol,$offsetId = 0,$limit = 20,$startDate = false,$endDate = false)
+    {
+        $query = [
+            'symbol' => $symbol
+        ];
+        if(!empty($offsetId)){
+            $query['offsetId'] = $offsetId;
+        }
+        if(!empty($limit)){
+            $query['limit'] = $limit;
+        }
+        if(!empty($startDate)){
+            $query['startDate'] = $startDate;
+        }
+        if(!empty($endDate)){
+            $query['endDate'] = $endDate;
+        }
+        ksort($query);
+        $this->api = $this->api.'/v1/trade/orders/matchresults?'.http_build_query($query);
+        $header = $this->createGetHeaderSign();
+        return $this->curlGet($this->api,$header);
+    }
+
     public function cancelOrder($order_id)
     {
           $this->api = $this->api.'/v1/trade/orders/'.$order_id.'/cancel';
@@ -206,5 +229,13 @@ class Api{
  *
     $Api = new Api('xxxxxx','xxxxx');
     var_dump($Api->cancelOrder('1'));
+ *
+ */
+
+/**
+ *  get my transaction records
+ *
+    $Api = new Api('xxxxxx','xxxxx');
+    var_dump($Api->getMatchresults('btcusdt'));
  *
  */
